@@ -1,0 +1,39 @@
+trigger:
+  branches:
+    include:
+      - main 
+
+pool:
+  vmImage: 'windows-latest'  # Use 'ubuntu-latest' for Linux builds if needed
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.x.x'  # Use the version number that corresponds to .NET Core 8
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'  # Restores all .csproj files
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'  # Builds all .csproj files
+    arguments: '--configuration $(buildConfiguration)'  # Uses the Release configuration
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '**/*.Tests.csproj'  # Runs tests in all test projects
+    arguments: '--configuration $(buildConfiguration) --no-build --verbosity normal'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'  # Publish build artifacts
+    artifactName: 'drop'
+    publishLocation: 'Container'
