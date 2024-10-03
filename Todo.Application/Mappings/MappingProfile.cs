@@ -8,7 +8,8 @@ public class MappingProfile: Profile
 {
     public MappingProfile()
     {
-        CreateMap<Domain.Models.Todo, TodoDTO>();
+        CreateMap<Todos, TodoDTO>();
+        CreateMap<CreateTodoDTO, Todos >();
         CreateMap<Users, UserDTO>();
     }
 }

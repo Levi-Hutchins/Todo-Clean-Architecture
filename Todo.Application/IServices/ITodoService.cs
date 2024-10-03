@@ -1,10 +1,12 @@
+using System.Collections;
+using Todo.Domain.Models;
 namespace Todo.Application.IServices;
 
 public interface ITodoService
 {
-    Task<Domain.Models.Todo> GetTodoByIdAsync(int id);
-    Task<IEnumerable<Domain.Models.Todo>> GetTodosAsync();
-    Task AddTodoAsync(Domain.Models.Todo todo);
-    Task UpdateTodoAsync(Domain.Models.Todo todo);
+    Task<Todos> GetTodoByIdAsync(int id);
+    Task<IEnumerable<Todos>> GetTodosAsync();
+    Task AddTodoAsync(Todos todo);
+    Task UpdateTodoAsync(Todos todo);
     Task DeleteTodoAsync(int id);
 }

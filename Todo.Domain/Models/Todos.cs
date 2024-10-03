@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Todo.Domain.Models;
 
-public class Todo
+public class Todos
 {
     public int Id { get; set; }
     [Required(ErrorMessage = "Title is required.")]
