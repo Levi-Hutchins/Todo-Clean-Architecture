@@ -36,7 +36,7 @@ namespace Todo.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError($"{e.Message} An error occured");
+                _logger.LogError(e, "An error occurred while getting the todo item with id {id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred");
             }
            
