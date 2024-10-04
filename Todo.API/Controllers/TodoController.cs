@@ -43,7 +43,7 @@ namespace Todo.API.Controllers
            
         }
         [HttpGet]
-        [ProducesResponseType(typeof(List<TodoDTO>),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<TodoDTO>),StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetTodoListAsync()
         {
@@ -62,6 +62,9 @@ namespace Todo.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(TodoDTO),StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateTodoAsync([FromBody] CreateTodoDTO createTodo)
         {
             try
@@ -72,7 +75,7 @@ namespace Todo.API.Controllers
                 }
 
                 var todo = _mapper.Map<Todos>(createTodo);
-                todo.Id = 999; // TODO: fix this later
+                todo.UserId = 1002; // Test User ID
                 _logger.LogInformation(JsonSerializer.Serialize(todo));
                 await _todoService.AddTodoAsync(todo);
                 return CreatedAtAction(nameof(GetTodoById), new { id = todo.Id }, _mapper.Map<TodoDTO>(todo));

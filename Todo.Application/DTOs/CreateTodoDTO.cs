@@ -8,6 +8,5 @@ public class CreateTodoDTO
 
     public bool IsComplete { get; set; } = false;
     
-    public int CategoryId { get; set; }
 
 }
