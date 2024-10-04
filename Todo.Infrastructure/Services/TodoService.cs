@@ -33,9 +33,20 @@ public class TodoService : ITodoService
         await _context.SaveChangesAsync();
     }
 
+    
     public async Task UpdateTodoAsync(Todos todo)
     {
-        _context.Todos.Update(todo);
+        // find by id in the db
+        var trackedEntity = _context.Todos.Local.FirstOrDefault(t => t.Id == todo.Id);
+    
+        // handle case of not found
+        if (trackedEntity == null)
+        {
+            _context.Todos.Attach(todo);
+        }
+    
+        // modify the state of the todo
+        _context.Entry(todo).State = EntityState.Modified;
         await _context.SaveChangesAsync();
     }
 

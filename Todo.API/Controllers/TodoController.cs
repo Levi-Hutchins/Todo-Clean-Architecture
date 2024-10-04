@@ -85,8 +85,33 @@ namespace Todo.API.Controllers
                 _logger.LogError(e, "An error occurred while creating a todo");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred");
             }
-           
+        }
 
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateTodoAsync([FromBody] UpdateTodoDTO updateTodo,int id)
+        {
+            try
+            {
+                var todoByID = await _todoService.GetTodoByIdAsync(id);
+                if (todoByID == null)
+                {
+                    return NotFound($"Todo {id} was not found");
+                }
+                var todoUpdate = _mapper.Map(updateTodo, todoByID);
+                _logger.LogInformation(JsonSerializer.Serialize(todoUpdate));
+                await _todoService.UpdateTodoAsync(todoUpdate);
+
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"An error occurred while updating the todo {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred");
+            }
+           
         }
     }
 }
