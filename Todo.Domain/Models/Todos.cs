@@ -11,7 +11,7 @@ public class Todos
     public string Description { get; set; }
     public bool IsComplete { get; set; } = false;
     public DateTime CreatedDate { get; set; } = DateTime.Now;
-    public DateTime DueDate { get; set; }
+    public DateTime DueDate { get; set; } = new DateTime(DateTime.Now.Year, 12, 31);
     [Required (ErrorMessage = "A user ID is required.")]
     public int UserId { get; set; }
     [Required (ErrorMessage = "A category ID is required.")]

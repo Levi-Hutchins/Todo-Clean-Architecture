@@ -43,7 +43,7 @@ namespace Todo.API.Controllers
            
         }
         [HttpGet]
-        [ProducesResponseType(typeof(List<TodoDTO>),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<TodoDTO>),StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetTodoListAsync()
         {
@@ -62,6 +62,9 @@ namespace Todo.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(TodoDTO),StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateTodoAsync([FromBody] CreateTodoDTO createTodo)
         {
             try
@@ -72,7 +75,7 @@ namespace Todo.API.Controllers
                 }
 
                 var todo = _mapper.Map<Todos>(createTodo);
-                todo.Id = 999; // TODO: fix this later
+                todo.UserId = 1002; // Test User ID
                 _logger.LogInformation(JsonSerializer.Serialize(todo));
                 await _todoService.AddTodoAsync(todo);
                 return CreatedAtAction(nameof(GetTodoById), new { id = todo.Id }, _mapper.Map<TodoDTO>(todo));
@@ -82,8 +85,61 @@ namespace Todo.API.Controllers
                 _logger.LogError(e, "An error occurred while creating a todo");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred");
             }
-           
+        }
 
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateTodoAsync([FromBody] UpdateTodoDTO updateTodo,int id)
+        {
+            //TODO: fix the model changing things that have no changed
+            try
+            {
+                var todoByID = await _todoService.GetTodoByIdAsync(id);
+                if (todoByID == null)
+                {
+                    return NotFound($"Todo {id} was not found");
+                }
+                var todoUpdate = _mapper.Map(updateTodo, todoByID);
+                _logger.LogInformation(JsonSerializer.Serialize(todoUpdate));
+                await _todoService.UpdateTodoAsync(todoUpdate);
+
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"An error occurred while updating the todo {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred");
+            }
+           
+        }
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(DeleteTodoDTO),StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteTodoAsync(int id)
+        {
+            try
+            {
+                var todoByID = await _todoService.GetTodoByIdAsync(id);
+                if (todoByID == null)
+                {
+                    return NotFound($"ID {id} was not found.");
+                }
+
+                await _todoService.DeleteTodoAsync(id);
+                return Ok(_mapper.Map<DeleteTodoDTO>(todoByID));
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"An error occurred while deleting the todo {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred");
+            }
+            
+            
+            
         }
     }
 }

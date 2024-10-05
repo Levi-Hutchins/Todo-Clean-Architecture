@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Todo.Application.IServices;
 using Microsoft.EntityFrameworkCore;
 using Todo.Domain.Models;
@@ -16,11 +17,9 @@ public class TodoService : ITodoService
     public async Task<Todos> GetTodoByIdAsync(int id)
     {
         var todo = await _context.Todos.FindAsync(id);
-        if (todo == null)
-        {
-            throw new KeyNotFoundException($"Todo item with id {id} was not found.");
-        }
-        return todo;    }
+    
+        return todo;    
+    }
 
     public async Task<IEnumerable<Todos>> GetTodosAsync()
     {
@@ -29,18 +28,32 @@ public class TodoService : ITodoService
 
     public async Task AddTodoAsync(Todos todo)
     {
-         _context.Todos.Add(todo);
+        _context.Todos.Add(todo);
+         
         await _context.SaveChangesAsync();
     }
 
+    
     public async Task UpdateTodoAsync(Todos todo)
     {
-        _context.Todos.Update(todo);
+        // find by id in the db
+        var trackedEntity = _context.Todos.Local.FirstOrDefault(t => t.Id == todo.Id);
+    
+        // handle case of not found
+        if (trackedEntity == null)
+        {
+            _context.Todos.Attach(todo);
+        }
+    
+        // modify the state of the todo
+        _context.Entry(todo).State = EntityState.Modified;
         await _context.SaveChangesAsync();
     }
 
     public async Task DeleteTodoAsync(int id)
     {
-        return;
+        var deleteTodo = _context.Todos.Where((t => t.Id == id)).First();
+        _context.Remove(deleteTodo);
+        await _context.SaveChangesAsync();
     }
 }

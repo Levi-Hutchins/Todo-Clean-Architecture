@@ -12,7 +12,8 @@ public static class DependencyInjection
         {
             services.AddDbContext<TodoDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-
+            
+            
             services.AddScoped<ITodoService, TodoService>();
 
             return services;
