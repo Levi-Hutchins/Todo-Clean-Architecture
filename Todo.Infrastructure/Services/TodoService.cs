@@ -28,7 +28,6 @@ public class TodoService : ITodoService
 
     public async Task AddTodoAsync(Todos todo)
     {
-        Console.WriteLine(JsonSerializer.Serialize(todo)); 
         _context.Todos.Add(todo);
          
         await _context.SaveChangesAsync();

@@ -49,13 +49,13 @@ public class TodoServiceTests
     }
 
     [Fact]
-    public async Task GetTodoByIdAsync_TodoDoesNotExist_ThrowsKeyNotFoundException()
+    public async Task GetTodoByIdAsync_TodoDoesNotExist_ReturnsNull()
     {
         var dbContext = GetInMemoryDbContext();
         var service = new TodoService(dbContext);
-
+        var todo = await service.GetTodoByIdAsync(99);
         // test a id that is not in db and expect appropriate error handling 
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.GetTodoByIdAsync(99));
+        Assert.Null(todo);
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class TodoServiceTests
 
 
     [Fact]
-    public async Task DeleteTodoAsync_TodoIsNotDeleted()
+    public async Task DeleteTodoAsync_TodoIsDeleted()
     {
         var dbContext = GetInMemoryDbContext();
         var service = new TodoService(dbContext);
@@ -173,7 +173,7 @@ public class TodoServiceTests
 
         await service.DeleteTodoAsync(5);
         var todoInDb = await dbContext.Todos.FindAsync(5);
-        // this test expects the method to not delete the item
-        Assert.NotNull(todoInDb);  
+        // this test expects the method to delete the item
+        Assert.Null(todoInDb);  
     }
 }
