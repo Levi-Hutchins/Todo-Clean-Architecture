@@ -12,6 +12,7 @@ public class MappingProfile: Profile
         CreateMap<Todos, TodoDTO>();
         CreateMap<CreateTodoDTO, Todos >();
         CreateMap<UpdateTodoDTO, Todos>();
+        CreateMap<Todos, DeleteTodoDTO>();
         CreateMap<Users, UserDTO>();
     }
 }
