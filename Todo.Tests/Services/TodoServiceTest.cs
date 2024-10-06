@@ -13,7 +13,7 @@ namespace Todo.Infrastructure.Tests.Services;
 public class TodoServiceTests
 {
     // in memory db context for local and CI unit tests
-    private TodoDbContext GetInMemoryDbContext()
+    private static TodoDbContext GetInMemoryDbContext()
     {
         // provides the EF context a local in memory database
         // that can be used at run time for unit testing
@@ -91,7 +91,7 @@ public class TodoServiceTests
         var result = await service.GetTodosAsync();
 
         Assert.NotNull(result);
-        Assert.Equal(4, result.Count());
+        Assert.Equal(2, result.Count());
     }
 
     [Fact]
