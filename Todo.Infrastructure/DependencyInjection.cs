@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Todo.Application.IServices;
+using Todo.Infrastructure.EntityFramework;
 using Todo.Infrastructure.Services;
 
 namespace Todo.Infrastructure;
