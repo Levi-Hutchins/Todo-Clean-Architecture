@@ -1,13 +1,14 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Todo.Domain.Models;
+using Todo.Infrastructure.EntityFramework;
 using Todo.Infrastructure.Services;
 using Xunit;
-using System.Linq;
-using Todo.Infrastructure;
+
+namespace Todo.Infrastructure.Tests.Services;
 
 public class TodoServiceTests
 {
