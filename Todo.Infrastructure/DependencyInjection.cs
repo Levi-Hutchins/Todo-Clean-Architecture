@@ -16,6 +16,8 @@ public static class DependencyInjection
             
             
             services.AddScoped<ITodoService, TodoService>();
+            services.AddScoped<IUserService, UserService>();
+
 
             return services;
         }
