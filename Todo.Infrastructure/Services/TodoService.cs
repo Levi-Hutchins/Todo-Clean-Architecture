@@ -29,6 +29,8 @@ public class TodoService : ITodoService
 
     public async Task AddTodoAsync(Todos todo)
     {
+        // TODO: need to check if it already exists
+
         _context.Todos.Add(todo);
          
         await _context.SaveChangesAsync();

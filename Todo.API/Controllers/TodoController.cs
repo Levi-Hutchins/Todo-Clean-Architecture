@@ -30,7 +30,10 @@ namespace Todo.API.Controllers
             try
             {
                 var todo = await _todoService.GetTodoByIdAsync(id);
-                if (todo == null) return NotFound();
+                if (todo == null) return NotFound(new
+                {
+                    msg = $"Todo {id} was not found."
+                });
 
                 // Map the entity to a DTO to prevent data leakage, and reduce coupling
                 return Ok(_mapper.Map<TodoDTO>(todo));
