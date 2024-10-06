@@ -5,5 +5,6 @@ namespace Todo.Application.IServices;
 public interface IUserService
 {
     Task<IEnumerable<User>> GetUsersAsync();
+    Task<IEnumerable<Todos>> GetUserTodosAsync(int id);
 
 }
