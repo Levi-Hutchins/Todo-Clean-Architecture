@@ -34,7 +34,7 @@ namespace Todo.API.Controllers
             try
             {
                 var users = await _service.GetUsersAsync();
-                if (users == null)
+                if (!users.Any())
                 {
                     return NotFound(new
                     {
@@ -51,12 +51,14 @@ namespace Todo.API.Controllers
             }
            
         }
+        
+        
         [HttpGet("{userId:int}")]
         [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserDTO>> GetUserByIdA(int userId)
+        public async Task<ActionResult<UserDTO>> GetUserById(int userId)
         {
             try
             {
@@ -92,6 +94,7 @@ namespace Todo.API.Controllers
             }
         }
 
+        
         [HttpGet("{userId:int}/todos")]
         [ProducesResponseType(typeof(IEnumerable<UserTodsDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -116,23 +119,67 @@ namespace Todo.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred");
             }
         }
+        
 
         [HttpPost]
+        [ProducesResponseType(typeof(UserDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<UserDTO>> CreateUserAsync([FromBody] UserDTO newUser)
         {
-            var user = _mapper.Map<User>(newUser);
-            
-            var addedUser = await _service.CreateUserAsync(user);
-            
-            _logger.LogInformation(JsonSerializer.Serialize(addedUser));
-            if (!addedUser.Success)
+            try
             {
-                return Conflict(addedUser.ErrorMessage);
+                var user = _mapper.Map<User>(newUser);
+
+                var addedUser = await _service.CreateUserAsync(user);
+
+                if (!addedUser.Success)
+                {
+                    return Conflict(addedUser.ErrorMessage);
+                }
+
+                // generates a location header for the user to find the newly created resouce with the corresponding id
+                // eg /api/User/123
+                return CreatedAtAction(nameof(GetUserById), new { userId = user.Id }, _mapper.Map<UserDTO>(user));
+
             }
-            return CreatedAtAction(nameof(GetUserByIdA), new { userId = user.Id }, _mapper.Map<UserDTO>(user));
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"An error occurred while creating user {newUser.Name}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred");
+                
+            }
+          
+        }
+
+
+        [HttpPut("{userId:int}")]
+        public async Task<ActionResult<UserDTO>> UpdateUserAsync(int userId, [FromBody] UserDTO updatedUser)
+        {
+            
+            var userById = await _service.GetUserAsync(userId);
+            if (userById == null)
+            {
+                return NotFound(new
+                {
+                    msg = $"User {userId} was not found."
+                });
+            }
+
+            var userUpdated = await _service.UpdateUserAsync(userId, updatedUser);
+            if (userUpdated == null)
+            {
+                return NotFound(new
+                {
+                    msg = $"Issue updating User {userId}"
+                });
+            }
+
+            return NoContent();
+
 
         }
-        
         
     }
 }

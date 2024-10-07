@@ -9,5 +9,6 @@ public interface IUserService
     Task<IEnumerable<Todos>> GetUserTodosAsync(int id);
     Task<UserCreatedDTO> CreateUserAsync(User newUser);
     Task<User?> GetUserAsync(int id);
+    Task<UserDTO?> UpdateUserAsync(int id, UserDTO updatedUser);
 
 }

@@ -49,4 +49,16 @@ public class UserService: IUserService
         return await _context.Users.FindAsync(id);
     }
 
+    public async Task<UserDTO?> UpdateUserAsync(int id, UserDTO updatedUser)
+    {
+
+        
+        var rowsAffected = await _context.Users.Where(user => user.Id == id)
+            .ExecuteUpdateAsync(updates =>
+                updates.SetProperty(user => user.Email, updatedUser.Email)
+                    .SetProperty(user => user.Name, updatedUser.Name));
+        await _context.SaveChangesAsync();
+        return rowsAffected == 0 ? null : updatedUser;
+    }
+
 }
