@@ -106,8 +106,16 @@ namespace Todo.API.Controllers
                 }
                 var todoUpdate = _mapper.Map(updateTodo, todoByID);
                 _logger.LogInformation(JsonSerializer.Serialize(todoUpdate));
-                await _todoService.UpdateTodoAsync(todoUpdate);
+                var todoUpdated = await _todoService.UpdateTodoAsync(todoUpdate);
+                if (todoUpdated == null)
+                {
+                    return NotFound(new
+                    {
+                        msg = $"Todo {id} was not found"
 
+                    });
+                }
+                
                 return NoContent();
             }
             catch (Exception e)

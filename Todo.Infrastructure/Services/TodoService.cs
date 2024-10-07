@@ -37,20 +37,15 @@ public class TodoService : ITodoService
     }
 
     
-    public async Task UpdateTodoAsync(Todos todo)
+    public async Task<Todos?> UpdateTodoAsync(Todos todo)
     {
-        // find by id in the db
-        var trackedEntity = _context.Todos.Local.FirstOrDefault(t => t.Id == todo.Id);
-    
-        // handle case of not found
-        if (trackedEntity == null)
-        {
-            _context.Todos.Attach(todo);
-        }
-    
-        // modify the state of the todo
-        _context.Entry(todo).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        var rowsAffected = await _context.Todos.Where(t => t.Id == todo.Id)
+            .ExecuteUpdateAsync(updates =>
+                updates.SetProperty(t => t.Description, todo.Description)
+                    .SetProperty(t => t.IsComplete, todo.IsComplete)
+                    .SetProperty(t => t.Title, todo.Title)
+                    .SetProperty(t => t.DueDate, todo.DueDate));
+        return rowsAffected == 0 ? null : todo;
     }
 
     public async Task DeleteTodoAsync(int id)
