@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,8 +10,8 @@ using Todo.Infrastructure.EntityFramework;
 
 namespace Todo.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _service;
@@ -50,36 +51,45 @@ namespace Todo.API.Controllers
             }
            
         }
-        [HttpGet("{userId}")]
+        [HttpGet("{userId:int}")]
         [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserDTO>> GetUserByIdAsync(int userId)
         {
-            if (userId <= 0)
+            try
             {
-                return BadRequest(new ProblemDetails
-                {
-                    Title = "Invalid User ID",
-                    Detail = $"The provided user ID {userId} is invalid.",
-                    Status = StatusCodes.Status400BadRequest
-                });
-            }
 
-            var user = await _service.GetUserAsync(userId);
-            if (user == null)
+                if (userId <= 0)
+                {
+                    return BadRequest(new ProblemDetails
+                    {
+                        Title = "Invalid User ID",
+                        Detail = $"The provided user ID {userId} is invalid.",
+                        Status = StatusCodes.Status400BadRequest
+                    });
+                }
+
+                var user = await _service.GetUserAsync(userId);
+                if (user == null)
+                {
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "User Not Found",
+                        Detail = $"User with ID {userId} was not found.",
+                        Status = StatusCodes.Status404NotFound
+                    });
+                }
+                
+                return Ok(_mapper.Map<UserDTO>(user));
+
+            }
+            catch (Exception e)
             {
-                return NotFound(new ProblemDetails
-                {
-                    Title = "User Not Found",
-                    Detail = $"User with ID {userId} was not found.",
-                    Status = StatusCodes.Status404NotFound
-                });
+                _logger.LogError(e, $"An error occurred while getting user {userId}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred");
             }
-            var userDto = _mapper.Map<UserDTO>(user); 
-
-            return Ok(_mapper.Map<UserDTO>(userDto));
         }
 
         [HttpGet("{userId:int}/todos")]
@@ -111,8 +121,15 @@ namespace Todo.API.Controllers
         public async Task<ActionResult<UserDTO>> CreateUserAsync([FromBody] UserDTO newUser)
         {
             var user = _mapper.Map<User>(newUser);
-            await _service.CreateUserAsync(user);
-            return CreatedAtAction(nameof(GetUserByIdAsync), new { id = user.Id }, _mapper.Map<UserDTO>(user));
+            
+            var addedUser = await _service.CreateUserAsync(user);
+            
+            _logger.LogInformation(JsonSerializer.Serialize(addedUser));
+            if (!addedUser.Success)
+            {
+                return Conflict(addedUser.ErrorMessage);
+            }
+            return CreatedAtAction(nameof(GetUserByIdAsync), new { userId = user.Id }, _mapper.Map<UserDTO>(user));
 
         }
         

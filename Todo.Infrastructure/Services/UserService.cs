@@ -25,12 +25,23 @@ public class UserService: IUserService
         return userTodos;
     }
 
-    public async Task<User> CreateUserAsync(User newUser)
+    public async Task<UserCreatedDTO> CreateUserAsync(User newUser)
     {
-        // TODO: need to check if it already exists
-        await _context.Users.AddAsync(newUser);
+        if (_context.Users.Any(u => u.Email == newUser.Email))
+        {
+            return new UserCreatedDTO
+            {
+                Success = false,
+                ErrorMessage = $"A user with the email {newUser.Email} already exists."
+            };
+        }
+        _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
-        return newUser;
+        return new UserCreatedDTO
+        {
+            Success = true,
+            CreatedUser = newUser
+        };
     }
 
     public async Task<User?> GetUserAsync(int id)
