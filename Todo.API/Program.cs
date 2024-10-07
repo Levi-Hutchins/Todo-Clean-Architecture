@@ -1,3 +1,4 @@
+using Todo.Application.ExceptionHandler;
 using Todo.Application.Mappings;
 using Todo.Infrastructure;
 
@@ -8,6 +9,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
@@ -23,6 +26,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 // redirect any unhandled errors to errors controller
 app.UseExceptionHandler("/errors");
