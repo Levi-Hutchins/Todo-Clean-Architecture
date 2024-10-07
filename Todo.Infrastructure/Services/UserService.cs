@@ -61,4 +61,11 @@ public class UserService: IUserService
         return rowsAffected == 0 ? null : updatedUser;
     }
 
+    public async Task DeleteUserAsync(int id)
+    {
+        // TODO: handle this  better
+        await _context.Users.Where(u => u.Id == id).ExecuteDeleteAsync();
+         
+    }
+
 }

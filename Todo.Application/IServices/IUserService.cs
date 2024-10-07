@@ -10,5 +10,6 @@ public interface IUserService
     Task<UserCreatedDTO> CreateUserAsync(User newUser);
     Task<User?> GetUserAsync(int id);
     Task<UserDTO?> UpdateUserAsync(int id, UserDTO updatedUser);
+    Task DeleteUserAsync(int id);
 
 }

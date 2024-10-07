@@ -31,8 +31,8 @@ namespace Todo.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsersAsync()
         {
-            try
-            {
+            
+            
                 var users = await _service.GetUsersAsync();
                 if (!users.Any())
                 {
@@ -43,12 +43,8 @@ namespace Todo.API.Controllers
                 }
 
                 return Ok(_mapper.Map<IEnumerable<UserDTO>>(users));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "An error occurred while getting the users");
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred");
-            }
+            
+         
            
         }
         
@@ -177,8 +173,27 @@ namespace Todo.API.Controllers
             }
 
             return NoContent();
+        }
 
+        [HttpDelete("{userId:int}")]
+        public async Task<IActionResult> DeleteUserAsync(int userId)
+        {
+            if (userId <= 0) return BadRequest(new {msg = $"UserId {userId} is invalid."});
 
+            try
+            {
+                var deleteUser = await _service.GetUserAsync(userId);
+                if (deleteUser == null) return NotFound(new { msg = $"User {userId} was not found." });
+
+                await _service.DeleteUserAsync(userId);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"An error occured while deleting user {userId}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An Error Occured");
+            }
+            
         }
         
     }
