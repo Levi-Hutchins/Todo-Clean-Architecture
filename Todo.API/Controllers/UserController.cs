@@ -56,7 +56,7 @@ namespace Todo.API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserDTO>> GetUserByIdAsync(int userId)
+        public async Task<ActionResult<UserDTO>> GetUserByIdA(int userId)
         {
             try
             {
@@ -129,7 +129,7 @@ namespace Todo.API.Controllers
             {
                 return Conflict(addedUser.ErrorMessage);
             }
-            return CreatedAtAction(nameof(GetUserByIdAsync), new { userId = user.Id }, _mapper.Map<UserDTO>(user));
+            return CreatedAtAction(nameof(GetUserByIdA), new { userId = user.Id }, _mapper.Map<UserDTO>(user));
 
         }
         
