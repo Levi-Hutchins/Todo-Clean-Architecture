@@ -22,6 +22,9 @@ public class UserService: IUserService
     public async Task<IEnumerable<Todos>> GetUserTodosAsync(int userId)
     {
         var userTodos = await _context.Todos.Where(t => t.UserId == userId).ToListAsync();
+        
+
+        
         return userTodos;
     }
 

@@ -78,7 +78,6 @@ namespace Todo.API.Controllers
                 }
 
                 var todo = _mapper.Map<Todos>(createTodo);
-                todo.UserId = 1002; // Test User ID
                 _logger.LogInformation(JsonSerializer.Serialize(todo));
                 await _todoService.AddTodoAsync(todo);
                 return CreatedAtAction(nameof(GetTodoById), new { id = todo.Id }, _mapper.Map<TodoDTO>(todo));

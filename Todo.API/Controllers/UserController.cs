@@ -36,9 +36,11 @@ namespace Todo.API.Controllers
                 var users = await _service.GetUsersAsync();
                 if (!users.Any())
                 {
-                    return NotFound(new
+                    return NotFound(new ProblemDetails
                     {
-                        msg = "No users found"
+                        Title = "Not Found",
+                        Status = 404,
+                        Detail = "No User were found"
                     });
                 }
 
@@ -74,7 +76,7 @@ namespace Todo.API.Controllers
                 {
                     return NotFound(new ProblemDetails
                     {
-                        Title = "User Not Found",
+                        Title = "Not Found",
                         Detail = $"User with ID {userId} was not found.",
                         Status = StatusCodes.Status404NotFound
                     });
@@ -124,6 +126,15 @@ namespace Todo.API.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<UserDTO>> CreateUserAsync([FromBody] UserDTO newUser)
         {
+            if (!ModelState.IsValid)
+            {
+                var messages = ModelState
+                    .SelectMany(modelState => modelState.Value.Errors)
+                    .Select(err => err.ErrorMessage)
+                    .ToList();
+
+                return BadRequest(messages);
+            }
             try
             {
                 var user = _mapper.Map<User>(newUser);
