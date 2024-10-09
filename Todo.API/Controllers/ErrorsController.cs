@@ -15,7 +15,7 @@ namespace Todo.API.Controllers
             var exceptionHandler = HttpContext.Features.Get<IExceptionHandlerFeature>();
             var exception = exceptionHandler.Error;
             // return a custom (default) error message
-            return new JsonResult(new {erroMessage = exception.Message});
+            return new JsonResult(new {errorMessage = exception.Message});
         }
     }
 }

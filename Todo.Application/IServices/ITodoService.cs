@@ -8,6 +8,6 @@ public interface ITodoService
     Task<Todos> GetTodoByIdAsync(int id);
     Task<IEnumerable<Todos>> GetTodosAsync();
     Task AddTodoAsync(Todos todo);
-    Task UpdateTodoAsync(Todos todo);
+    Task<Todos?> UpdateTodoAsync(Todos todo);
     Task DeleteTodoAsync(int id);
 }
